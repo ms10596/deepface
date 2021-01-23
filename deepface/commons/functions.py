@@ -208,12 +208,12 @@ def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_det
 			for face in faces:
 				x,y,w,h = face
 				detected_faces.append(img[int(y):int(y+h), int(x):int(x+w)])
-			return detected_faces
+			return np.array(detected_faces)
 		
 		else: #if no face detected
 	
 			if enforce_detection != True:			
-				return []
+				return np.array([])
 	
 			else:
 				raise ValueError("Face could not be detected. Please confirm that the picture is a face photo or consider to set enforce_detection param to False.")
@@ -263,12 +263,12 @@ def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_det
 				
 				detected_faces.append(base_img[int(top*aspect_ratio_y):int(bottom*aspect_ratio_y), int(left*aspect_ratio_x):int(right*aspect_ratio_x)])
 			
-			return detected_faces
+			return np.array(detected_faces)
 			
 		else: #if no face detected
 	
 			if enforce_detection != True:
-				return []
+				return np.array([])
 	
 			else:
 				raise ValueError("Face could not be detected. Please confirm that the picture is a face photo or consider to set enforce_detection param to False.")
@@ -285,12 +285,12 @@ def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_det
 				
 				detected_faces.append(img[top:bottom, left:right])
 				
-				return detected_faces
+				return np.array(detected_faces)
 			
 		else: #if no face detected
 	
 			if enforce_detection != True:			
-				return []
+				return np.array([])
 	
 			else:
 				raise ValueError("Face could not be detected. Please confirm that the picture is a face photo or consider to set enforce_detection param to False.") 
@@ -305,11 +305,11 @@ def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_det
 			for detection in detections:
 				x, y, w, h = detection["box"]
 				detected_faces.append(img[int(y):int(y+h), int(x):int(x+w)])
-			return detected_faces
+			return np.array(detected_faces)
 		
 		else: #if no face detected
 			if not enforce_detection:			
-				return []
+				return np.array([])
 	
 			else:
 				raise ValueError("Face could not be detected. Please confirm that the picture is a face photo or consider to set enforce_detection param to False.")
