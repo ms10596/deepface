@@ -451,7 +451,7 @@ def preprocess_face(img, target_size=(224, 224), grayscale = False, enforce_dete
 	
 	#--------------------------
 	
-	if imgs.shape[0] > 0 and imgs.shape[1] > 0:
+	if imgs.shape[0] > 0:
 		imgs = [align_face(img = img, detector_backend = detector_backend) for img in imgs]
 	else:
 		
