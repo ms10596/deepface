@@ -186,7 +186,7 @@ def load_image(img):
 	
 	return img
 	
-def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_detection = True):
+def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_detection = False):
 	
 	home = str(Path.home())
 	
@@ -204,9 +204,11 @@ def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_det
 			pass
 		
 		if len(faces) > 0:
-			x,y,w,h = faces[0] #focus on the 1st face found in the image
-			detected_face = img[int(y):int(y+h), int(x):int(x+w)]
-			return detected_face
+			detected_faces = []
+			for face in faces:
+				x,y,w,h = face
+				detected_faces.append(img[int(y):int(y+h), int(x):int(x+w)])
+			return detected_faces
 		
 		else: #if no face detected
 	
@@ -249,18 +251,19 @@ def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_det
 		if detections_df.shape[0] > 0:
 			
 			#TODO: sort detections_df
+				
+			detected_faces = []
+			for i in range(df.shape[0]):
+				instance = detections_df.iloc[i]
+				
+				left = instance["left"]
+				right = instance["right"]
+				bottom = instance["bottom"]
+				top = instance["top"]
+				
+				detected_faces.append(base_img[int(top*aspect_ratio_y):int(bottom*aspect_ratio_y), int(left*aspect_ratio_x):int(right*aspect_ratio_x)])
 			
-			#get the first face in the image	
-			instance = detections_df.iloc[0]
-			
-			left = instance["left"]
-			right = instance["right"]
-			bottom = instance["bottom"]
-			top = instance["top"]
-			
-			detected_face = base_img[int(top*aspect_ratio_y):int(bottom*aspect_ratio_y), int(left*aspect_ratio_x):int(right*aspect_ratio_x)]
-			
-			return detected_face
+			return detected_faces
 			
 		else: #if no face detected
 	
@@ -299,10 +302,11 @@ def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_det
 		detections = face_detector.detect_faces(img_rgb)
 		
 		if len(detections) > 0:
-			detection = detections[0]
-			x, y, w, h = detection["box"]
-			detected_face = img[int(y):int(y+h), int(x):int(x+w)]
-			return detected_face
+			detected_faces = []
+			for detection in detections:
+				x, y, w, h = detection["box"]
+				detected_faces.append(img[int(y):int(y+h), int(x):int(x+w)])
+			return detected_faces
 		
 		else: #if no face detected
 			if not enforce_detection:			
@@ -436,7 +440,7 @@ def align_face(img, detector_backend = 'opencv'):
 				
 		return img #return img anyway
 	
-def preprocess_face(img, target_size=(224, 224), grayscale = False, enforce_detection = True, detector_backend = 'opencv'):
+def preprocess_face(img, target_size=(224, 224), grayscale = False, enforce_detection = False, detector_backend = 'opencv'):
 	
 	#img_path = copy.copy(img)
 	
@@ -444,12 +448,12 @@ def preprocess_face(img, target_size=(224, 224), grayscale = False, enforce_dete
 	img = load_image(img)
 	base_img = img.copy()
 	
-	img = detect_face(img = img, detector_backend = detector_backend, grayscale = grayscale, enforce_detection = enforce_detection)
+	imgs = detect_face(img = img, detector_backend = detector_backend, grayscale = grayscale, enforce_detection = enforce_detection)
 	
 	#--------------------------
 	
-	if img.shape[0] > 0 and img.shape[1] > 0:
-		img = align_face(img = img, detector_backend = detector_backend)
+	if imgs.shape[0] > 0 and imgs.shape[1] > 0:
+		imgs = [align_face(img = img, detector_backend = detector_backend) for img in imgs]
 	else:
 		
 		if enforce_detection == True:
@@ -461,14 +465,17 @@ def preprocess_face(img, target_size=(224, 224), grayscale = False, enforce_dete
 	
 	#post-processing
 	if grayscale == True:
-		img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+		imgs = [cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) for img in imgs]
 		
-	img = cv2.resize(img, target_size)
-	img_pixels = image.img_to_array(img)
-	img_pixels = np.expand_dims(img_pixels, axis = 0)
-	img_pixels /= 255 #normalize input in [0, 1]
 	
-	return img_pixels
+	pixels = []
+	for img in imgs:
+		img = cv2.resize(img, target_size)
+		img_pixels = image.img_to_array(img)
+		img_pixels = np.expand_dims(img_pixels, axis = 0)
+		img_pixels /= 255 #normalize input in [0, 1]
+		pixels.append(img_pixels)	
+	return np.array(pixels)
 
 def find_input_shape(model):
 	
