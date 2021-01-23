@@ -213,7 +213,7 @@ def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_det
 		else: #if no face detected
 	
 			if enforce_detection != True:			
-				return img
+				return []
 	
 			else:
 				raise ValueError("Face could not be detected. Please confirm that the picture is a face photo or consider to set enforce_detection param to False.")
@@ -268,8 +268,7 @@ def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_det
 		else: #if no face detected
 	
 			if enforce_detection != True:
-				img = base_img.copy()
-				return img
+				return []
 	
 			else:
 				raise ValueError("Face could not be detected. Please confirm that the picture is a face photo or consider to set enforce_detection param to False.")
@@ -279,19 +278,19 @@ def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_det
 		detections = face_detector(img, 1)
 		
 		if len(detections) > 0:
-			
+			detected_faces = []
 			for idx, d in enumerate(detections):
 				left = d.left(); right = d.right()
 				top = d.top(); bottom = d.bottom()
 				
-				detected_face = img[top:bottom, left:right]
+				detected_faces.append(img[top:bottom, left:right])
 				
-				return detected_face
+				return detected_faces
 			
 		else: #if no face detected
 	
 			if enforce_detection != True:			
-				return img
+				return []
 	
 			else:
 				raise ValueError("Face could not be detected. Please confirm that the picture is a face photo or consider to set enforce_detection param to False.") 
@@ -310,7 +309,7 @@ def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_det
 		
 		else: #if no face detected
 			if not enforce_detection:			
-				return img
+				return []
 	
 			else:
 				raise ValueError("Face could not be detected. Please confirm that the picture is a face photo or consider to set enforce_detection param to False.")
