@@ -285,7 +285,7 @@ def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_det
 				
 				detected_faces.append(img[top:bottom, left:right])
 				
-				return np.array(detected_faces)
+			return np.array(detected_faces)
 			
 		else: #if no face detected
 	
@@ -458,7 +458,7 @@ def preprocess_face(img, target_size=(224, 224), grayscale = False, enforce_dete
 		if enforce_detection == True:
 			raise ValueError("Detected face shape is ", img.shape,". Consider to set enforce_detection argument to False.")
 		else: #restore base image 
-			img = base_img.copy()
+			return np.array([])
 		
 	#--------------------------
 	
@@ -467,14 +467,14 @@ def preprocess_face(img, target_size=(224, 224), grayscale = False, enforce_dete
 		imgs = [cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) for img in imgs]
 		
 	
-	pixels = []
-	for img in imgs:
-		img = cv2.resize(img, target_size)
-		img_pixels = image.img_to_array(img)
-		img_pixels = np.expand_dims(img_pixels, axis = 0)
-		img_pixels /= 255 #normalize input in [0, 1]
-		pixels.append(img_pixels)	
-	return np.array(pixels)
+	# pixels = []
+	# for img in imgs:
+	# 	img = cv2.resize(img, target_size)
+	# 	img_pixels = image.img_to_array(img)
+	# 	# img_pixels = np.expand_dims(img_pixels, axis = 0)
+	# 	img_pixels /= 255 #normalize input in [0, 1]
+	# 	pixels.append(img_pixels)	
+	return np.array(imgs)
 
 def find_input_shape(model):
 	
