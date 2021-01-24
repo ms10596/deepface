@@ -253,7 +253,7 @@ def detect_face(img, detector_backend = 'opencv', grayscale = False, enforce_det
 			#TODO: sort detections_df
 				
 			detected_faces = []
-			for i in range(df.shape[0]):
+			for i in range(detections_df.shape[0]):
 				instance = detections_df.iloc[i]
 				
 				left = instance["left"]
